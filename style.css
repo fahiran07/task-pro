@@ -1,0 +1,130 @@
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: 100vh;
+}
+* {
+	box-sizing: border-box;
+}
+
+.container {
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	width: 400px;
+}
+nav {
+	height: 3.5rem;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	border-bottom: 2px solid black;
+}
+
+h1 {
+	text-align: center;
+	color: #333;
+}
+
+.input-section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 15px;
+}
+
+input {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+button {
+	padding: 10px;
+	background-color: #28a745;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #218838;
+}
+
+.tasks-section {
+	margin-top: 20px;
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+	font-size: 0.8rem;
+	border-bottom: 1px solid #ccc;
+}
+
+li.completed {
+	text-decoration: line-through;
+	color: #888;
+}
+
+.summary-section {
+	margin-top: 20px;
+	text-align: center;
+	background-color: #ffffff; /* Purple background */
+	padding: 10px;
+	border-radius: 10px; /* Makes the box circular */
+	width: 100%; /* Fixed width for the circle */
+	height: 100px; /* Fixed height for the circle */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: 10px auto; /* Center the circle */
+}
+
+.summary-section h2 {
+	font-size: 18px;
+	margin: 0 0 10px 0;
+}
+
+.summary-section p {
+	font-size: 14px;
+	margin: 5px 0;
+}
+
+.summary-section #totalTime {
+	font-weight: bold;
+	color: #ffd600; /* Yellow color for emphasis */
+}
+
+.summary-section #completionTime {
+	font-weight: bold;
+	color: #00e676; /* Green color for emphasis */
+}
+
+@media screen and (max-width: 768px) {
+	.container {
+		box-shadow: none;
+	}
+	body {
+		background-color: #fff;
+	}
+}
