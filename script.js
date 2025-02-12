@@ -4,6 +4,7 @@ const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("taskList");
 const totalTime = document.getElementById("totalTime");
 const completionTime = document.getElementById("completionTime");
+const clearAllBtn = document.getElementById("clearAllBtn"); // Clear All Button
 
 // Load tasks from localStorage when the page loads
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
@@ -48,6 +49,9 @@ function renderTasks() {
 		li.appendChild(checkbox);
 		taskList.appendChild(li);
 	});
+
+	// Disable Clear All Button if no tasks
+	clearAllBtn.disabled = tasks.length === 0;
 }
 
 function toggleTaskCompletion(index) {
@@ -69,6 +73,16 @@ function calculateSummary() {
 		completionTime.textContent = "-";
 	}
 }
+
+// Clear All Tasks Functionality
+clearAllBtn.addEventListener("click", () => {
+	if (confirm("Are you sure you want to clear all tasks?")) {
+		tasks = [];
+		saveTasks();
+		renderTasks();
+		calculateSummary();
+	}
+});
 
 // Load tasks when the page loads
 window.addEventListener("load", () => {
