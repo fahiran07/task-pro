@@ -1,4 +1,5 @@
 const taskInput = document.getElementById("taskInput");
+let taskItem = document.getElementsByClassName("task-item");
 const taskHours = document.getElementById("taskHours");
 const taskMinutes = document.getElementById("taskMinutes");
 const addTaskBtn = document.getElementById("addTaskBtn");
@@ -15,7 +16,7 @@ function saveTasks() {
 }
 
 function addTask() {
-	const taskName = taskInput.value.trim();
+	const taskName = taskItem.length + 1 + ". " + taskInput.value.trim();
 	const hours = parseInt(taskHours.value) || 0;
 	const minutes = parseInt(taskMinutes.value) || 0;
 
