@@ -344,18 +344,6 @@ li.completed {
   color: white;
 }
 
-.priority-high {
-  border-left: 4px solid #f56565;
-}
-
-.priority-medium {
-  border-left: 4px solid #ed8936;
-}
-
-.priority-low {
-  border-left: 4px solid #48bb78;
-}
-
 @media screen and (max-width: 480px) {
   .container {
     margin: 0;

@@ -8,7 +8,6 @@ let isClearAll = false;
 const taskInput = document.getElementById("taskInput");
 const taskHours = document.getElementById("taskHours");
 const taskMinutes = document.getElementById("taskMinutes");
-const taskPriority = document.getElementById("taskPriority");
 const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("taskList");
 const clearAllBtn = document.getElementById("clearAllBtn");
@@ -97,7 +96,6 @@ function addTask() {
   const taskText = taskInput.value.trim();
   const hours = parseInt(taskHours.value) || 0;
   const minutes = parseInt(taskMinutes.value) || 0;
-  const priority = taskPriority.value;
 
   if (!taskText) {
     showErrorDialog("Task description cannot be empty");
@@ -122,7 +120,6 @@ function addTask() {
     text: taskText,
     hours,
     minutes,
-    priority,
     completed: false,
     createdAt: new Date().toISOString(),
     completedAt: null,
@@ -140,7 +137,6 @@ function resetInputs() {
   taskInput.value = "";
   taskHours.value = "0";
   taskMinutes.value = "";
-  taskPriority.value = "low";
   taskInput.focus();
 }
 
@@ -206,7 +202,7 @@ function renderTasks() {
 
   filteredTasks.forEach((task) => {
     const li = document.createElement("li");
-    li.className = `task-item priority-${task.priority} ${task.completed ? "completed" : ""}`;
+    li.className = `task-item ${task.completed ? "completed" : ""}`;
 
     const taskInfo = document.createElement("div");
     taskInfo.className = "task-info";
@@ -218,10 +214,9 @@ function renderTasks() {
     const meta = document.createElement("div");
     meta.className = "task-meta";
     meta.innerHTML = `
-			<span><i class="far fa-clock"></i> ${task.hours}h ${task.minutes}m</span>
-			<span><i class="fas fa-flag"></i> ${task.priority}</span>
-			<span><i class="far fa-calendar"></i> ${new Date(task.createdAt).toLocaleDateString()}</span>
-		`;
+      <span><i class="far fa-clock"></i> ${task.hours}h ${task.minutes}m</span>
+      <span><i class="far fa-calendar"></i> ${new Date(task.createdAt).toLocaleDateString()}</span>
+    `;
 
     taskInfo.appendChild(title);
     taskInfo.appendChild(meta);
