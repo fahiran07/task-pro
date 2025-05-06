@@ -218,7 +218,7 @@ function updateStatistics() {
   if (timeInfo.remainingTime > 0) {
     totalCompletionTime.textContent = `${formatTime(timeInfo.completionTime)} (${remainingHours}h ${remainingMinutes}m)`;
   } else {
-    totalCompletionTime.textContent = "All tasks completed!";
+    totalCompletionTime.textContent = "Completed!";
   }
 
   // Update progress bar
