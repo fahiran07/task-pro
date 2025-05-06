@@ -109,8 +109,9 @@ function addTask() {
     return;
   }
 
-  if (minutes === 0) {
-    showErrorDialog("Please enter minutes greater than 0");
+  // Only validate minutes if hours is 0 or blank
+  if (hours === 0 && minutes === 0) {
+    showErrorDialog("Please enter either hours or minutes greater than 0");
     taskMinutes.focus();
     return;
   }
