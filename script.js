@@ -124,6 +124,7 @@ function addTask() {
     completed: false,
     createdAt: new Date().toISOString(),
     completedAt: null,
+    taskNumber: tasks.length + 1, // Store the original task number
   };
 
   tasks.push(task);
@@ -207,7 +208,7 @@ function renderTasks() {
     return a.completed ? 1 : -1;
   });
 
-  filteredTasks.forEach((task, index) => {
+  filteredTasks.forEach((task) => {
     const li = document.createElement("li");
     li.className = `task-item ${task.completed ? "completed" : ""}`;
 
@@ -246,10 +247,10 @@ function renderTasks() {
       actions.appendChild(deleteBtn);
     }
 
-    // Add task number
+    // Add task number using the stored number
     const taskNumber = document.createElement("div");
     taskNumber.className = "task-number";
-    taskNumber.textContent = `#${index + 1}`;
+    taskNumber.textContent = `#${task.taskNumber}`;
 
     li.appendChild(taskNumber);
     li.appendChild(taskInfo);
