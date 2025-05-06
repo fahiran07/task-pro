@@ -201,7 +201,13 @@ function renderTasks() {
     if (currentFilter === "pending") return !task.completed;
   });
 
-  filteredTasks.forEach((task) => {
+  // Sort tasks: completed tasks go to bottom
+  filteredTasks.sort((a, b) => {
+    if (a.completed === b.completed) return 0;
+    return a.completed ? 1 : -1;
+  });
+
+  filteredTasks.forEach((task, index) => {
     const li = document.createElement("li");
     li.className = `task-item ${task.completed ? "completed" : ""}`;
 
@@ -240,6 +246,12 @@ function renderTasks() {
       actions.appendChild(deleteBtn);
     }
 
+    // Add task number
+    const taskNumber = document.createElement("div");
+    taskNumber.className = "task-number";
+    taskNumber.textContent = `#${index + 1}`;
+
+    li.appendChild(taskNumber);
     li.appendChild(taskInfo);
     li.appendChild(actions);
     taskList.appendChild(li);
