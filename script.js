@@ -1,150 +1,255 @@
+// Task Management System
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let currentFilter = "all";
+let taskToDelete = null;
+let isClearAll = false;
+
+// DOM Elements
 const taskInput = document.getElementById("taskInput");
-let taskItem = document.getElementsByClassName("task-item");
 const taskHours = document.getElementById("taskHours");
 const taskMinutes = document.getElementById("taskMinutes");
+const taskPriority = document.getElementById("taskPriority");
 const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("taskList");
-const totalTime = document.getElementById("totalTime");
-const completionTime = document.getElementById("completionTime");
 const clearAllBtn = document.getElementById("clearAllBtn");
+const filterBtns = document.querySelectorAll(".filter-btn");
 
-// Load tasks from localStorage when the page loads
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+// Dialog Elements
+const confirmDialog = document.getElementById("confirmDialog");
+const confirmDialogText = document.getElementById("confirmDialogText");
+const confirmDeleteBtn = document.getElementById("confirmDelete");
+const confirmCancelBtn = document.getElementById("confirmCancel");
 
-function saveTasks() {
-	localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+// Error Dialog Elements
+const errorDialog = document.getElementById("errorDialog");
+const errorDialogText = document.getElementById("errorDialogText");
+const errorOkBtn = document.getElementById("errorOk");
 
-function addTask() {
-	const taskName = taskItem.length + 1 + ". " + taskInput.value.trim();
-	const hours = parseInt(taskHours.value) || 0;
-	const minutes = parseInt(taskMinutes.value) || 0;
+// Statistics Elements
+const totalTasksEl = document.getElementById("totalTasks");
+const completedTasksEl = document.getElementById("completedTasks");
+const pendingTasksEl = document.getElementById("pendingTasks");
+const totalTimeEl = document.getElementById("totalTime");
+const progressBar = document.getElementById("progressBar");
+const productivityScore = document.getElementById("productivityScore");
 
-	if (taskName && (hours > 0 || minutes > 0)) {
-		const task = {
-			name: taskName,
-			hours: hours,
-			minutes: minutes,
-			completed: false,
-		};
-		tasks.push(task);
-		saveTasks(); // Save tasks to localStorage
-		renderTasks();
-		calculateSummary();
-		taskInput.value = "";
-		taskHours.value = "0";
-		taskMinutes.value = "0";
-	} else {
-		alert("Please enter a valid task name and duration.");
-	}
-}
-
-function renderTasks() {
-	taskList.innerHTML = "";
-	tasks.forEach((task, index) => {
-		const li = document.createElement("li");
-		li.className = "task-item";
-		li.style.display = "flex";
-		li.style.justifyContent = "space-between";
-		li.style.alignItems = "center";
-
-		if (task.completed) {
-			li.classList.add("completed");
-		}
-
-		// Task name and duration
-		const taskText = document.createElement("span");
-		taskText.textContent = `${task.name} (${task.hours}h ${task.minutes}m)`;
-
-		// Action container for checkbox + delete button
-		const actionDiv = document.createElement("div");
-		actionDiv.style.display = "flex";
-		actionDiv.style.alignItems = "center";
-		actionDiv.style.gap = "10px"; // Space between checkbox & delete btn
-
-		// Checkbox
-		const checkbox = document.createElement("input");
-		checkbox.type = "checkbox";
-		checkbox.checked = task.completed;
-		checkbox.addEventListener("change", () => toggleTaskCompletion(index));
-
-		// Delete button
-		const deleteBtn = document.createElement("button");
-		deleteBtn.className = "delete-btn";
-		deleteBtn.textContent = "Delete";
-		deleteBtn.style.padding = "5px 10px";
-		deleteBtn.style.fontSize = "0.7rem";
-		deleteBtn.addEventListener("click", () => deleteTask(index));
-
-		// Append checkbox & delete button in action div
-		actionDiv.appendChild(checkbox);
-		actionDiv.appendChild(deleteBtn);
-
-		// Append elements to li
-		li.appendChild(taskText);
-		li.appendChild(actionDiv);
-
-		taskList.appendChild(li);
-	});
-
-	// Disable Clear All Button if no tasks
-	clearAllBtn.disabled = tasks.length === 0;
-}
-
-function toggleTaskCompletion(index) {
-	tasks[index].completed = !tasks[index].completed;
-	saveTasks(); // Save tasks to localStorage
-	renderTasks();
-	calculateSummary();
-}
-
-function deleteTask(index) {
-	tasks.splice(index, 1); // Remove the task
-	saveTasks(); // Save tasks to localStorage
-	renderTasks();
-	calculateSummary();
-}
-
-function calculateSummary() {
-	let totalHours = 0;
-	let totalMinutes = 0;
-
-	tasks.forEach((task) => {
-		if (!task.completed) {
-			totalHours += task.hours;
-			totalMinutes += task.minutes;
-		}
-	});
-
-	// Convert excess minutes to hours
-	totalHours += Math.floor(totalMinutes / 60);
-	totalMinutes = totalMinutes % 60;
-
-	totalTime.textContent = `${totalHours}h ${totalMinutes}m`;
-
-	if (totalHours > 0 || totalMinutes > 0) {
-		const now = new Date();
-		const completion = new Date(now.getTime() + (totalHours * 60 + totalMinutes) * 60 * 1000);
-		completionTime.textContent = completion.toLocaleTimeString();
-	} else {
-		completionTime.textContent = "-";
-	}
-}
-
-// Clear All Tasks Functionality
-clearAllBtn.addEventListener("click", () => {
-	if (confirm("Are you sure you want to clear all tasks?")) {
-		tasks = []; // Clear the tasks array
-		saveTasks(); // Update localStorage
-		renderTasks(); // Re-render the task list
-		calculateSummary(); // Update the summary
-	}
-});
-
-// Load tasks when the page loads
-window.addEventListener("load", () => {
-	renderTasks();
-	calculateSummary();
-});
-
+// Event Listeners
 addTaskBtn.addEventListener("click", addTask);
+clearAllBtn.addEventListener("click", () => {
+  isClearAll = true;
+  showDialog("all tasks");
+});
+filterBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    filterBtns.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderTasks();
+  });
+});
+
+// Dialog Event Listeners
+confirmDeleteBtn.addEventListener("click", () => {
+  if (isClearAll) {
+    tasks = [];
+    saveTasks();
+    renderTasks();
+    updateStatistics();
+  } else if (taskToDelete) {
+    tasks = tasks.filter((task) => task.id !== taskToDelete);
+    saveTasks();
+    renderTasks();
+    updateStatistics();
+  }
+  hideDialog();
+});
+
+confirmCancelBtn.addEventListener("click", hideDialog);
+errorOkBtn.addEventListener("click", hideErrorDialog);
+
+// Show Dialog
+function showDialog(taskText) {
+  const message = isClearAll ? "Are you sure you want to delete all tasks? This action cannot be undone." : `Are you sure you want to delete the task "${taskText}"?`;
+  confirmDialogText.textContent = message;
+  confirmDialog.classList.add("active");
+}
+
+// Hide Dialog
+function hideDialog() {
+  confirmDialog.classList.remove("active");
+  taskToDelete = null;
+  isClearAll = false;
+}
+
+// Show Error Dialog
+function showErrorDialog(message) {
+  errorDialogText.textContent = message;
+  errorDialog.classList.add("active");
+}
+
+// Hide Error Dialog
+function hideErrorDialog() {
+  errorDialog.classList.remove("active");
+}
+
+// Add Task Function
+function addTask() {
+  const taskText = taskInput.value.trim();
+  const hours = parseInt(taskHours.value) || 0;
+  const minutes = parseInt(taskMinutes.value) || 0;
+  const priority = taskPriority.value;
+
+  if (!taskText) {
+    showErrorDialog("Task description cannot be empty");
+    taskInput.focus();
+    return;
+  }
+
+  if (taskText.length < 10) {
+    showErrorDialog("Task description must be at least 10 characters long");
+    taskInput.focus();
+    return;
+  }
+
+  if (minutes === 0) {
+    showErrorDialog("Please enter minutes greater than 0");
+    taskMinutes.focus();
+    return;
+  }
+
+  const task = {
+    id: Date.now(),
+    text: taskText,
+    hours,
+    minutes,
+    priority,
+    completed: false,
+    createdAt: new Date().toISOString(),
+    completedAt: null,
+  };
+
+  tasks.push(task);
+  saveTasks();
+  renderTasks();
+  updateStatistics();
+  resetInputs();
+}
+
+// Reset Input Fields
+function resetInputs() {
+  taskInput.value = "";
+  taskHours.value = "0";
+  taskMinutes.value = "";
+  taskPriority.value = "low";
+  taskInput.focus();
+}
+
+// Save Tasks to Local Storage
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Toggle Task Completion
+function toggleTask(id) {
+  const task = tasks.find((t) => t.id === id);
+  if (task) {
+    task.completed = !task.completed;
+    task.completedAt = task.completed ? new Date().toISOString() : null;
+    saveTasks();
+    renderTasks();
+    updateStatistics();
+  }
+}
+
+// Delete Task
+function deleteTask(id) {
+  const task = tasks.find((t) => t.id === id);
+  if (task) {
+    isClearAll = false;
+    taskToDelete = id;
+    showDialog(task.text);
+  }
+}
+
+// Update Statistics
+function updateStatistics() {
+  const total = tasks.length;
+  const completed = tasks.filter((task) => task.completed).length;
+  const pending = total - completed;
+  const totalTime = tasks.reduce((acc, task) => {
+    return acc + (task.hours * 60 + task.minutes);
+  }, 0);
+
+  totalTasksEl.textContent = total;
+  completedTasksEl.textContent = completed;
+  pendingTasksEl.textContent = pending;
+  totalTimeEl.textContent = `${Math.floor(totalTime / 60)}h ${totalTime % 60}m`;
+
+  // Update progress bar
+  const progress = total === 0 ? 0 : (completed / total) * 100;
+  progressBar.style.width = `${progress}%`;
+
+  // Calculate productivity score
+  const productivity = total === 0 ? 0 : Math.round((completed / total) * 100);
+  productivityScore.textContent = `Productivity: ${productivity}%`;
+}
+
+// Render Tasks
+function renderTasks() {
+  taskList.innerHTML = "";
+
+  const filteredTasks = tasks.filter((task) => {
+    if (currentFilter === "all") return true;
+    if (currentFilter === "completed") return task.completed;
+    if (currentFilter === "pending") return !task.completed;
+  });
+
+  filteredTasks.forEach((task) => {
+    const li = document.createElement("li");
+    li.className = `task-item priority-${task.priority} ${task.completed ? "completed" : ""}`;
+
+    const taskInfo = document.createElement("div");
+    taskInfo.className = "task-info";
+
+    const title = document.createElement("div");
+    title.className = "task-title";
+    title.textContent = task.text;
+
+    const meta = document.createElement("div");
+    meta.className = "task-meta";
+    meta.innerHTML = `
+			<span><i class="far fa-clock"></i> ${task.hours}h ${task.minutes}m</span>
+			<span><i class="fas fa-flag"></i> ${task.priority}</span>
+			<span><i class="far fa-calendar"></i> ${new Date(task.createdAt).toLocaleDateString()}</span>
+		`;
+
+    taskInfo.appendChild(title);
+    taskInfo.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.innerHTML = task.completed ? '<i class="fas fa-undo"></i> Undo' : '<i class="fas fa-check"></i> Complete';
+    toggleBtn.onclick = () => toggleTask(task.id);
+
+    // Add toggle button first
+    actions.appendChild(toggleBtn);
+
+    // Only show delete button if task is not completed
+    if (!task.completed) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+      deleteBtn.onclick = () => deleteTask(task.id);
+      actions.appendChild(deleteBtn);
+    }
+
+    li.appendChild(taskInfo);
+    li.appendChild(actions);
+    taskList.appendChild(li);
+  });
+}
+
+// Initial Render
+renderTasks();
+updateStatistics();
