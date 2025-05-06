@@ -32,6 +32,9 @@ const totalTimeEl = document.getElementById("totalTime");
 const progressBar = document.getElementById("progressBar");
 const productivityScore = document.getElementById("productivityScore");
 
+// Add new DOM element for total completion time
+const totalCompletionTime = document.getElementById("totalCompletionTime");
+
 // Event Listeners
 addTaskBtn.addEventListener("click", addTask);
 clearAllBtn.addEventListener("click", () => {
@@ -169,6 +172,31 @@ function deleteTask(id) {
   }
 }
 
+// Function to calculate remaining time and completion time
+function calculateTimeInfo() {
+  const now = new Date();
+  let totalRemainingMinutes = 0;
+  let completionTime = new Date(now);
+
+  tasks.forEach((task) => {
+    if (!task.completed) {
+      totalRemainingMinutes += task.hours * 60 + task.minutes;
+    }
+  });
+
+  completionTime.setMinutes(completionTime.getMinutes() + totalRemainingMinutes);
+
+  return {
+    remainingTime: totalRemainingMinutes,
+    completionTime: completionTime,
+  };
+}
+
+// Function to format time
+function formatTime(date) {
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 // Update Statistics
 function updateStatistics() {
   const total = tasks.length;
@@ -180,8 +208,18 @@ function updateStatistics() {
 
   totalTasksEl.textContent = total;
   completedTasksEl.textContent = completed;
-  pendingTasksEl.textContent = pending;
   totalTimeEl.textContent = `${Math.floor(totalTime / 60)}h ${totalTime % 60}m`;
+
+  // Calculate and display remaining time and completion time
+  const timeInfo = calculateTimeInfo();
+  const remainingHours = Math.floor(timeInfo.remainingTime / 60);
+  const remainingMinutes = timeInfo.remainingTime % 60;
+
+  if (timeInfo.remainingTime > 0) {
+    totalCompletionTime.textContent = `${formatTime(timeInfo.completionTime)} (${remainingHours}h ${remainingMinutes}m)`;
+  } else {
+    totalCompletionTime.textContent = "All tasks completed!";
+  }
 
   // Update progress bar
   const progress = total === 0 ? 0 : (completed / total) * 100;
@@ -221,8 +259,12 @@ function renderTasks() {
 
     const meta = document.createElement("div");
     meta.className = "task-meta";
+
+    // Calculate remaining time for this task
+    const remainingTime = task.completed ? "Completed" : `${task.hours}h ${task.minutes}m remaining`;
+
     meta.innerHTML = `
-      <span><i class="far fa-clock"></i> ${task.hours}h ${task.minutes}m</span>
+      <span><i class="far fa-clock"></i> ${remainingTime}</span>
       <span><i class="far fa-calendar"></i> ${new Date(task.createdAt).toLocaleDateString()}</span>
     `;
 
