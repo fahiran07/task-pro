@@ -175,7 +175,6 @@ function deleteTask(id) {
   }
 }
 
-// Function to calculate remaining time and completion time
 function calculateTimeInfo() {
   const now = new Date();
   let totalRemainingMinutes = 0;
@@ -189,9 +188,17 @@ function calculateTimeInfo() {
 
   completionTime.setMinutes(completionTime.getMinutes() + totalRemainingMinutes);
 
+  // Format to 12-hour time
+  const hours = completionTime.getHours();
+  const minutes = completionTime.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12; // Convert 0 to 12
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+
   return {
     remainingTime: totalRemainingMinutes,
-    completionTime: completionTime,
+    completionTime: formattedTime,
   };
 }
 
