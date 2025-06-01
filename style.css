@@ -7,9 +7,8 @@ body {
 }
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #121212;
   min-height: 100vh;
-  color: #2d3748;
 }
 * {
   box-sizing: border-box;
@@ -18,7 +17,7 @@ body {
 }
 
 .container {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #121212;
   padding: 12px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -30,7 +29,7 @@ body {
 }
 nav {
   height: 50px;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: 121212;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -60,8 +59,9 @@ h1 {
   grid-template-columns: 1fr;
   gap: 8px;
   margin-bottom: 12px;
-  background-color: #f7fafc;
+  background-color: #1e1e1e;
   border-radius: 8px;
+  padding: 5px;
 }
 
 @media (min-width: 480px) {
@@ -72,11 +72,15 @@ h1 {
 
 input,
 select {
-  padding: 8px;
-  border: 2px solid #e2e8f0;
+  padding: 12px;
   border-radius: 6px;
   font-size: 13px;
   transition: all 0.3s ease;
+  color: #9b9b9b;
+}
+input {
+  background-color: #121212;
+  border: none;
 }
 
 input:focus,
@@ -117,8 +121,10 @@ button:hover {
 #clearAllBtn:hover {
   background-color: #cc0000; /* Darker red on hover */
 }
-.tasks-section {
-  margin-top: 20px;
+
+.tasks-section h2 {
+  color: #9b9b9b;
+  margin-bottom: 1rem;
 }
 
 ul {
@@ -181,16 +187,15 @@ li.completed {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin: 15px 0;
+  margin: 0 0 15px 0;
 }
 
 .stat-card {
-  background-color: #f7fafc;
+  background-color: #1e1e1e;
   padding: 12px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
 }
 
 .stat-card h3 {
@@ -212,6 +217,7 @@ li.completed {
 .progress-section h3 {
   font-size: 14px;
   margin-bottom: 5px;
+  color: #333;
 }
 
 .progress-bar {
@@ -219,19 +225,18 @@ li.completed {
 }
 
 .task-item {
-  background-color: #f7fafc;
+  background-color: #1e1e1e;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: 4px;
   margin: 8px 0 6px 0;
   display: flex;
-  flex-direction: column;
   gap: 6px;
   text-align: left;
   width: 100%;
-  border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
+  color: #718096;
 }
 
 .task-number {
@@ -241,7 +246,6 @@ li.completed {
   font-size: 10px;
   color: #718096;
   font-weight: bold;
-  background-color: #e2e8f0;
   padding: 2px 6px;
   border-radius: 4px;
 }
@@ -252,7 +256,6 @@ li.completed {
 }
 
 .task-item.completed {
-  background-color: #f0fdf4;
   border-color: #86efac;
   box-shadow: 0 1px 3px rgba(22, 163, 74, 0.1);
 }

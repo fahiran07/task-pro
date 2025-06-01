@@ -30,7 +30,6 @@ const completedTasksEl = document.getElementById("completedTasks");
 const pendingTasksEl = document.getElementById("pendingTasks");
 const totalTimeEl = document.getElementById("totalTime");
 const progressBar = document.getElementById("progressBar");
-const productivityScore = document.getElementById("productivityScore");
 
 // Add new DOM element for total completion time
 const totalCompletionTime = document.getElementById("totalCompletionTime");
@@ -58,7 +57,7 @@ confirmDeleteBtn.addEventListener("click", () => {
     renderTasks();
     updateStatistics();
   } else if (taskToDelete) {
-    tasks = tasks.filter((task) => task.id !== taskToDelete);
+    tasks = tasks.filter((task) => task.id != taskToDelete);
     saveTasks();
     renderTasks();
     updateStatistics();
@@ -152,7 +151,11 @@ function saveTasks() {
 
 // Toggle Task Completion
 function toggleTask(id) {
-  const task = tasks.find((t) => t.id === id);
+  console.log(`Toggling task with ID: ${id}`);
+
+  const task = tasks.find((t) => t.id == id);
+  console.log(tasks);
+
   if (task) {
     task.completed = !task.completed;
     task.completedAt = task.completed ? new Date().toISOString() : null;
@@ -164,7 +167,7 @@ function toggleTask(id) {
 
 // Delete Task
 function deleteTask(id) {
-  const task = tasks.find((t) => t.id === id);
+  const task = tasks.find((t) => t.id == id);
   if (task) {
     isClearAll = false;
     taskToDelete = id;
@@ -224,10 +227,6 @@ function updateStatistics() {
   // Update progress bar
   const progress = total === 0 ? 0 : (completed / total) * 100;
   progressBar.style.width = `${progress}%`;
-
-  // Calculate productivity score
-  const productivity = total === 0 ? 0 : Math.round((completed / total) * 100);
-  productivityScore.textContent = `Productivity: ${productivity}%`;
 }
 
 // Render Tasks
@@ -246,59 +245,36 @@ function renderTasks() {
     return a.completed ? 1 : -1;
   });
 
+  let htmlContent = "";
+
   filteredTasks.forEach((task) => {
-    const li = document.createElement("li");
-    li.className = `task-item ${task.completed ? "completed" : ""}`;
-
-    const taskInfo = document.createElement("div");
-    taskInfo.className = "task-info";
-
-    const title = document.createElement("div");
-    title.className = "task-title";
-    title.textContent = task.text;
-
-    const meta = document.createElement("div");
-    meta.className = "task-meta";
-
-    // Calculate remaining time for this task
     const remainingTime = task.completed ? "Completed" : `${task.hours}h ${task.minutes}m remaining`;
+    const taskClass = task.completed ? "completed" : "";
 
-    meta.innerHTML = `
-      <span><i class="far fa-clock"></i> ${remainingTime}</span>
-      <span><i class="far fa-calendar"></i> ${new Date(task.createdAt).toLocaleDateString()}</span>
-    `;
+    htmlContent += `
+    <li class="task-item ${taskClass}" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #333;">
+      <input type="checkbox" ${task.completed ? "checked" : ""} onchange="toggleTask('${task.id}')" style="width: 18px; height: 18px; cursor: pointer;" />
 
-    taskInfo.appendChild(title);
-    taskInfo.appendChild(meta);
+      <div style="flex: 1;">
+        <div class="task-title" style="font-size: 12px; font-weight: 500; color: #fff;">${task.text}</div>
+        <div class="task-meta" style="font-size: 12px; color: #aaa; margin-top: 2px;">
+          <span><i class="far fa-clock"></i> ${remainingTime}</span>
+        </div>
+      </div>
 
-    const actions = document.createElement("div");
-    actions.className = "task-actions";
-
-    const toggleBtn = document.createElement("button");
-    toggleBtn.innerHTML = task.completed ? '<i class="fas fa-undo"></i> Undo' : '<i class="fas fa-check"></i> Complete';
-    toggleBtn.onclick = () => toggleTask(task.id);
-
-    // Add toggle button first
-    actions.appendChild(toggleBtn);
-
-    // Only show delete button if task is not completed
-    if (!task.completed) {
-      const deleteBtn = document.createElement("button");
-      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
-      deleteBtn.onclick = () => deleteTask(task.id);
-      actions.appendChild(deleteBtn);
-    }
-
-    // Add task number using the stored number
-    const taskNumber = document.createElement("div");
-    taskNumber.className = "task-number";
-    taskNumber.textContent = `#${task.taskNumber}`;
-
-    li.appendChild(taskNumber);
-    li.appendChild(taskInfo);
-    li.appendChild(actions);
-    taskList.appendChild(li);
+      ${
+        !task.completed
+          ? `<button onclick="deleteTask('${task.id}')" style="background: none; border: none; color: #f44336; cursor: pointer;">
+              <i class="fas fa-trash"></i>
+            </button>`
+          : ""
+      }
+    </li>
+  `;
   });
+
+  // Inject into the task list container
+  taskList.innerHTML = htmlContent;
 }
 
 // Initial Render
