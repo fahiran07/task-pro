@@ -194,9 +194,12 @@ function calculateTimeInfo() {
   };
 }
 
-// Function to format time
 function formatTime(date) {
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true, // <-- forces 12-hour format
+  });
 }
 
 // Update Statistics
